@@ -42,11 +42,14 @@ def add_handler(name, handler, priority=100):
         # The base handler opens the structure up for adding more than one handler
         async def base_handler(*args, **kwargs):
             for h in handlers[name]:
-                if inspect.iscoroutinefunction(h):
-                    if await h(client, *args, **kwargs):
+                try:
+                    if inspect.iscoroutinefunction(h):
+                        if await h(client, *args, **kwargs):
+                            break
+                    elif h(client, *args, **kwargs):
                         break
-                elif h(client, *args, **kwargs):
-                    break
+                except Exception as e:
+                    log.error('Error executing handler', exc_info=e)
         base_handler.__name__ = name
         client.event(base_handler)
         handlers[name] = []
@@ -112,12 +115,15 @@ async def server_init(client):
 
 
 def start():
-    if bot_cfg['devenv']:
-        key = bot_cfg['prod_token'] + ':' + bot_cfg['secret']
-        vault.prepare(key)
-    else:
-        key = bot_cfg['token'] + ':' + bot_cfg['secret']
-    vault.unlock(key)
+    try:
+        if bot_cfg['devenv']:
+            key = bot_cfg['prod_token'] + ':' + bot_cfg['secret']
+            vault.prepare(key)
+        else:
+            key = bot_cfg['token'] + ':' + bot_cfg['secret']
+        vault.unlock(key)
+    except Exception as e:
+        log.error('Could not initialize vault', exc_info=e)
 
     # https://discord.com/api/oauth2/authorize?client_id=754288259265200160&permissions=738323520&scope=bot
     client.run(bot_cfg['token'])
