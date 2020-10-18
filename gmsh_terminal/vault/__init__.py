@@ -1,10 +1,13 @@
 import base64
 import os
 import yaml
+import logging
 
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+
+log = logging.getLogger(__name__)
 
 vault = {}
 

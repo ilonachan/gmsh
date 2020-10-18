@@ -39,7 +39,7 @@ def load_feature(name):
         feature_list.append(module)
         return
 
-    dirpath = os.path.dirname(__file__)+'/features';
+    dirpath = os.path.dirname(__file__) + '/features'
 
     # do the python magic boogie-woogie
     if isfile(f'{dirpath}/{name}.py'):
@@ -74,7 +74,7 @@ def unload_feature(name):
 
 
 def load_all_features():
-    cmd_base = os.path.dirname(__file__)+'/features'
+    cmd_base = os.path.dirname(__file__) + '/features'
     for file in [join(cmd_base, f) for f in listdir(cmd_base)]:
         if isfile(file):
             file = splitext(file)[0]
@@ -90,9 +90,8 @@ def unload_all_features():
             feature.unload_feature()
 
 
-if __name__ == '__main__':
-    load_all_features()
+load_all_features()
 
-    gmsh_terminal.features.dpyserver.start()
+gmsh_terminal.features.dpyserver.start()
 
-    unload_all_features()
+unload_all_features()

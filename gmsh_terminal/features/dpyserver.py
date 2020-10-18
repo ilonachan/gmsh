@@ -117,9 +117,11 @@ async def server_init(client):
 def start():
     try:
         if bot_cfg['devenv']:
+            log.info('Generating vault file')
             key = bot_cfg['prod_token'] + ':' + bot_cfg['secret']
             vault.prepare(key)
         else:
+            log.info('Reading encrypted vault')
             key = bot_cfg['token'] + ':' + bot_cfg['secret']
         vault.unlock(key)
     except Exception as e:

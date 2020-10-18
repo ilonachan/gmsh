@@ -69,7 +69,7 @@ mention_pattern = re.compile(r'<@!?(\d+)>', re.MULTILINE)
 
 
 @gmsh_command('stealpfp', usage='usage: stealpfp <@USERID> # just tag someone', mundane=True)
-async def stealpfp_command(ctx, args, **kwargs):
+async def stealpfp_command(ctx: CommandContext, args, **kwargs):
     m = mention_pattern.match(args[1])
     if m is None:
         await ctx.channel.send(codify(f'No valid mention was specified', ctx.mundane))
@@ -77,6 +77,9 @@ async def stealpfp_command(ctx, args, **kwargs):
 
     userid = int(m.group(1))
     usr = ctx.client.get_user(userid)
+    if usr is None:
+        await ctx.channel.send(codify(f'Could not get user', ctx.mundane))
+        return
     if usr.avatar is None:
         await ctx.channel.send(codify(f'The user {usr} has not set an avatar', ctx.mundane))
         return
@@ -90,3 +93,12 @@ async def countrole_command(ctx: CommandContext, args, **kwargs):
     for role in ctx.message.role_mentions:
         term.write(f'Role {role.mention} has {len(role.members)} members')
     term.close()
+
+
+@gmsh_command('bubblewrap', usage='usage: bubblewrap <width>x<height> [<text to use as bubbles>]', mundane=True)
+async def bubblewrap_command(ctx: CommandContext, args, **kwargs):
+    match = re.fullmatch(r'(\d+)x(\d+)', args[1] if len(args) > 1 else '')
+    width, height = (int(match.group(1)), int(match.group(2))) if match is not None else (4, 6)
+    text = args[2] if len(args) > 2 else 'pop'
+    result = (('||'+text+'||')*width+'\n')*height
+    await ctx.channel.send(result)
