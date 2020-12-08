@@ -101,4 +101,6 @@ async def bubblewrap_command(ctx: CommandContext, args, **kwargs):
     width, height = (int(match.group(1)), int(match.group(2))) if match is not None else (4, 6)
     text = args[2] if len(args) > 2 else 'pop'
     result = (('||'+text+'||')*width+'\n')*height
+    if len(result) > 2000:
+        await ctx.channel.send('That bubble wrap would be too large to be sent through Discord')
     await ctx.channel.send(result)
