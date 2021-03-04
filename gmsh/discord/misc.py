@@ -1,12 +1,16 @@
-import discord
+import logging
 
-from gmsh_terminal.features.dpyserver import discord_handler
-import gmsh_terminal.vault as vault
+import discord
+from gmsh.discord import discord_handler
+
+from gmsh.config import cfg
+
+logger = logging.getLogger(__name__)
 
 
 @discord_handler('on_message')
 async def k_name_handler(client, message):
-    if 'k_real_name' in vault.vault and vault.vault['k_real_name'] in message.content.lower():
+    if cfg.k_real_name.exists() and cfg.k_real_name() in message.content.lower():
         await message.delete()
         puro = discord.utils.find(lambda m: m.id == 480160612022747136, message.guild.members)
         msg = await message.channel.send(f'Congrats {message.author.mention}, you did it!' +

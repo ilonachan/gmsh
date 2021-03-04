@@ -44,6 +44,8 @@ async def on_reaction_add(client, reaction, user):
         return
 
     yandere_role = discord.utils.find(lambda r: r.name == 'Stabby Stabby Yandere', user.guild.roles)
+    if yandere_role is None:
+        return
     if reaction.emoji == '🔪':
         await user.add_roles(yandere_role)
     if reaction.emoji == '💚' and user.id != 751499881683615784:

@@ -165,12 +165,12 @@ def gmsh_command(name, *, usage=None, aliases=None, mundane=False, **metadata):
                 return await self.func(ctx, args, *pargs, metadata=self.metadata, **kwargs)
             except CmdUsage:
                 if self.usage is not None:
-                    await ctx.channel.send(codify('usage: ' + self.usage, ctx.mundane))
+                    await ctx.message.reply(codify('usage: ' + self.usage, ctx.mundane))
                 else:
                     if ctx.mundane:
-                        await ctx.channel.send('incorrect usage, but no help text was found')
+                        await ctx.message.reply('incorrect usage, but no help text was found')
                     else:
-                        await ctx.channel.send('```diff\n- incorrect usage, but no help text was found\n```')
+                        await ctx.message.reply('```diff\n- incorrect usage, but no help text was found\n```')
             except Exception as e:
                 logger.error('error executing command ' + args[0], exc_info=True)
                 raise e
@@ -205,9 +205,10 @@ async def typing_loop(channel: TextChannel):
 
 
 class Terminal:
-    def __init__(self, channel, mundane=False):
+    def __init__(self, channel, mundane=False, call=None):
         self.channel = channel
         self.message = None
+        self.call = call
         self.content = ''
         self.mundane = mundane
 
@@ -220,7 +221,10 @@ class Terminal:
         asyncio.get_event_loop().create_task(self.async_write(content))
 
     async def async_write(self, content):
-        self.message = await self.channel.send(codify(content, self.mundane), allowed_mentions=None)
+        if self.call is None:
+            self.message = await self.channel.send(codify(content, self.mundane), allowed_mentions=None)
+        else:
+            self.message = await self.call.reply(codify(content, self.mundane), allowed_mentions=None)
         logger.debug(f'Sent message: {content}')
 
     def close(self):
@@ -265,7 +269,7 @@ class CommandContext:
         self.client = client
 
     def new_terminal(self):
-        term = Terminal(self.channel, self.mundane)
+        term = Terminal(self.channel, self.mundane, self.message)
         self.terminals.append(term)
         logger.debug('Created new terminal')
         return term
@@ -273,7 +277,7 @@ class CommandContext:
     def dm_terminal(self):
         if self.user.dm_channel is None:
             self.user.create_dm()
-        term = Terminal(self.user.dm_channel, self.mundane)
+        term = Terminal(self.user.dm_channel, self.mundane, self.message)
         self.dm_terminals.append(term)
         logger.debug('Created new DM terminal')
         return term
@@ -331,7 +335,7 @@ async def on_message(client: Client, message: Message):
         if mundane:
             return False
 
-        await message.channel.send(codify('gmsh: command "' + args[0].lower() + '" not found'))
+        await message.reply(codify('gmsh: command "' + args[0].lower() + '" not found'))
         return True
 
     if not commands[args[0]].mundane:
@@ -341,10 +345,10 @@ async def on_message(client: Client, message: Message):
         ctx = CommandContext(message.channel, message.author, client, mundane, message, env_map={}, commands=commands)
         await commands[args[0]](ctx, args)
     except CmdUsage:
-        await message.channel.send(codify(commands[args[0]].usage(), mundane))
+        await message.reply(codify(commands[args[0]].usage(), mundane))
     except Exception as e:
         logger.error(f'Exception while executing command line "{msg}"', exc_info=True)
-        await message.channel.send(codify('Something went wrong while trying to process your request,'
+        await message.reply(codify('Something went wrong while trying to process your request,'
                                           ' please try again later.\n'
                                           'If this error persists, please report it to @Nagato.', mundane))
         raise e

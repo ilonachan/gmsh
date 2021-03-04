@@ -3,7 +3,7 @@ version: '3.7'
 
 volumes:
   db:
-  postgres:
+  pg_data:
 
 services:
   gmsh:
@@ -12,8 +12,8 @@ services:
     image: gmsh_terminal:dev
     environment:
       # I'll just assume that SQLAlchemy will handle any database definition I throw at it
-      - DB_LOCATION postgresql:///gmsh:Secret Password@db:5432/gmsh
-      - DB_PLAYGROUND_LOCATION postgresql:///gmsh:Secret Password@db:5432/playground
+      - DB_LOCATION="postgresql:///gmsh:Secret Password@db:5432/gmsh"
+      - DB_PLAYGROUND_LOCATION="postgresql:///gmsh:Secret Password@db:5432/playground"
     env_file:
       # Some keys I can't check into GitHub, like the BOT_TOKEN or the VAULT_KEY.
       # Instead I will place them in a .gitignore'd file called secret_env
@@ -24,13 +24,14 @@ services:
   db:
     image: postgres:13-alpine
     environment:
-      - POSTGRES_USER gmsh
+      - POSTGRES_USER=gmsh
       # this shouldn't even be necessary since the database is only accessible in the cluster
-      - POSTGRES_PASSWORD Secret Password
-      - PGDATA /data/postgres
+      - POSTGRES_PASSWORD="Secret Password"
+      # does not seem to work
+      # - PGDATA=/data/postgres
     # potential security risk without major advantages
 #    ports:
 #      - 5432:5432
     volumes:
-      - postgres:/data/postgres
+      - pg_data:/var/lib/postgresql/data
     restart: unless-stopped

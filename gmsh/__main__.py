@@ -16,6 +16,7 @@ def load_modules():
     import gmsh.discord.database
     import gmsh.discord.knife
     import gmsh.discord.dcsings
+    import gmsh.discord.determination
 
     gmsh.discord.commands.load()
 

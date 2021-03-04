@@ -87,4 +87,4 @@ async def env_command(ctx, args, metadata=None):
 
 @gmsh_command('invite', mundane=True)
 async def invite_command(ctx: CommandContext, args, metadata=None):
-    await ctx.channel.send(discord.utils.oauth_url(ctx.client.user.id, Permissions(cfg.discord.permissions(0))))
+    await ctx.message.reply(discord.utils.oauth_url(ctx.client.user.id, Permissions(cfg.discord.permissions(0))))

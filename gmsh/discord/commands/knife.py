@@ -5,13 +5,16 @@ from gmsh.discord.commands import gmsh_command, CmdUsage
 logger = logging.getLogger(__name__)
 
 
-async def request_answer(terminal, ctx, statement):
+async def request_answer(terminal, ctx, statement, call=None):
     request = await ctx.user.send('```\nReceived unknown KNIFE request:\n' + statement +
                                   '\nPlease type your answer as a single message.```')
     msg = await ctx.client.wait_for('message', check=lambda m: m.channel == request.channel and
                                                                m.author == ctx.user)
     logger.info(msg.content)
-    await terminal.channel.send('```\n' + msg.content + '\n```')
+    if call is None:
+        await terminal.channel.send('```\n' + msg.content + '\n```')
+    else:
+        await call.reply('```\n' + msg.content + '\n```')
 
 
 async def knife_single(terminal, ctx, statement):
@@ -30,7 +33,7 @@ async def knife_loop(terminal, ctx):
                                         '"KNIFE: the New Interactive Functional Environment"\n```')
             return
 
-        await request_answer(terminal, ctx, msg.content)
+        await request_answer(terminal, ctx, msg.content, msg)
 
 
 @gmsh_command('knife', usage='knife stab | init | stop')

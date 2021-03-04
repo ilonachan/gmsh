@@ -1,12 +1,12 @@
 from setuptools import setup
 
 setup(
-    name='gmsh_terminal',
-    version='1.0',
-    packages=['gmsh_terminal', 'gmsh_terminal.features', 'gmsh_terminal.features.commands',
-              'gmsh_terminal.features.determination'],
+    name='gmsh',
+    version='1.2',
+    packages=['gmsh', 'gmsh.discord', 'gmsh.config',
+              'gmsh.database', 'gmsh.discord.commands'],
     url='',
-    license='',
+    license='MIT',
     author='Nagato_Yoshikage#2286',
     author_email='',
     description=''

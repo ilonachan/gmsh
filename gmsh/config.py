@@ -59,6 +59,13 @@ class PathChainer:
                 return args[0]
             raise
 
+    def exists(self):
+        try:
+            self()
+            return True
+        except KeyError:
+            return False
+
     def __trace_path__(self):
         newpath = []
         current = self
