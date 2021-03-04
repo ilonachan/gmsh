@@ -1,5 +1,7 @@
 import logging
 
+from gmsh.config import cfg
+
 from sqlalchemy import create_engine, Table, Column, Integer, String, ForeignKey, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
@@ -8,8 +10,8 @@ log = logging.getLogger(__name__)
 
 Base = declarative_base()
 
-default_engine = create_engine('sqlite:///gmsh.sqlite')
-sqlol_engine = create_engine('sqlite:///playground.sqlite')
+default_engine = create_engine(cfg.db.main.location('sqlite:///gmsh.sqlite'))
+sqlol_engine = create_engine(cfg.db.playground.location('sqlite:///playground.sqlite'))
 
 
 class ReactionMessage(Base):

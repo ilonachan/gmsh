@@ -10,3 +10,5 @@ __pycache__/
 /pid.lock
 /secret_env
 /config/secret.yaml
+/db/
+/deploy.env
