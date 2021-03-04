@@ -8,3 +8,5 @@ __pycache__/
 /gmsh_terminal/vault/vault_base.yaml
 /gmsh_terminal/vault/vault_key.key
 /pid.lock
+/secret_env
+/config/secret.yaml

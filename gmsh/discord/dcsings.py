@@ -2,13 +2,9 @@ import logging
 
 import discord
 
-from gmsh_terminal.features.dpyserver import discord_handler
+from gmsh.discord import discord_handler
 
 logger = logging.getLogger(__name__)
-
-
-def load_feature(old_module=None):
-    pass
 
 
 songs = ["""\
@@ -95,7 +91,7 @@ async def process_lyrics(message):
 
 @discord_handler
 async def on_message(client, message):
-    if not hasattr(message.channel, 'guild'):
+    if message.channel.guild is None:
         return False
     if message.author.bot:
         return False
