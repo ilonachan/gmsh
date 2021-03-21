@@ -1,4 +1,16 @@
-FROM python:3.8.6
+# Use a builder container to install the dependencies,
+# then switch to a more lightweight interpreter
+FROM python:3.9 AS builder
+
+COPY requirements.txt .
+RUN pip install --user -r requirements.txt
+
+# Setup the final container
+FROM python:3.9-slim
+COPY --from=builder /root/.local /root/.local
+ENV PATH=/root/.local:$PATH
+
+WORKDIR /gmsh
 
 VOLUME /gmsh/config
 
@@ -8,18 +20,14 @@ VOLUME /db
 ENV DB_LOCATION sqlite:////db/gmsh.sqlite
 ENV DB_PLAYGROUND_LOCATION sqlite:////db/playground.sqlite
 
-WORKDIR /gmsh
-
-# install required libraries
-COPY ./requirements.txt /gmsh/requirements.txt
-RUN pip install -r /gmsh/requirements.txt
-
-# copy the code and default configuration
-COPY ./gmsh /gmsh/gmsh
-COPY ./logging.yaml /gmsh/logging.yaml
-
 # This will become relevant if I add a web interface to my bot
 # ENV SERVER_PORT 8080
 # EXPOSE $SERVER_PORT
+
+COPY ./logging.yaml .
+
+# copy the code and default configuration
+COPY ./gmsh ./gmsh
+COPY ./ezconf ./ezconf
 
 CMD [ "python", "-m", "gmsh" ]
