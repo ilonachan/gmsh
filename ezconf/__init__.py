@@ -1,6 +1,7 @@
 import yaml
 import logging
 import os
+import re
 
 log = logging.getLogger(__name__)
 
@@ -119,7 +120,7 @@ def from_env_var(key, env_var):
 def map2dict(mapping, source=os.environ):
     result = {}
     for key in mapping:
-        if type(mapping[key]) is str:
+        if type(mapping[key]) is str and mapping[key] in source:
             result[key] = source[mapping[key]]
         if type(mapping[key]) is dict:
             result[key] = map2dict(mapping[key], source=source)
@@ -143,7 +144,14 @@ def from_file(path, type='yaml'):
         raise
 
 
-def from_directory(path, type=None):
+def from_directory(path, type=None, filter=r'.*\.yaml'):
+    log.info(f'Reading config from directory {path}')
     for f in os.listdir(path):
         t = type or 'yaml'
-        from_file(os.path.join(path, f), type=t)
+        p = os.path.join(path, f)
+        if not re.match(filter, p):
+            continue
+        if os.path.isfile(p):
+            from_file(p, type=t)
+        if os.path.isdir(p):
+            from_directory(p, type)

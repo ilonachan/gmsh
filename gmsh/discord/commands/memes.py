@@ -72,16 +72,16 @@ mention_pattern = re.compile(r'<@!?(\d+)>', re.MULTILINE)
 async def stealpfp_command(ctx: CommandContext, args, **kwargs):
     m = mention_pattern.match(args[1])
     if m is None:
-        await ctx.message.reply(codify(f'No valid mention was specified', ctx.mundane))
+        await ctx.message.reply(codify(f'No valid mention was specified', ctx.mundane), mention_author=False)
         return
 
     userid = int(m.group(1))
     usr = ctx.client.get_user(userid)
     if usr is None:
-        await ctx.message.reply(codify(f'Could not get user', ctx.mundane))
+        await ctx.message.reply(codify(f'Could not get user', ctx.mundane), mention_author=False)
         return
     if usr.avatar is None:
-        await ctx.message.reply(codify(f'The user {usr} has not set an avatar', ctx.mundane))
+        await ctx.message.reply(codify(f'The user {usr} has not set an avatar', ctx.mundane), mention_author=False)
         return
     await ctx.message.reply(f'https://cdn.discordapp.com/avatars/{usr.id}/{usr.avatar}.png?size=1024')
     return
@@ -102,5 +102,5 @@ async def bubblewrap_command(ctx: CommandContext, args, **kwargs):
     text = args[2] if len(args) > 2 else 'pop'
     result = (('||'+text+'||')*width+'\n')*height
     if len(result) > 2000:
-        await ctx.message.reply('That bubble wrap would be too large to be sent through Discord')
+        await ctx.message.reply('That bubble wrap would be too large to be sent through Discord', mention_author=False)
     await ctx.channel.send(result)

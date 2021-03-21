@@ -13,6 +13,7 @@ from discord.abc import GuildChannel, User
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
+from ezconf import cfg
 from gmsh.discord import discord_handler
 
 logger = logging.getLogger(__name__)
@@ -165,12 +166,12 @@ def gmsh_command(name, *, usage=None, aliases=None, mundane=False, **metadata):
                 return await self.func(ctx, args, *pargs, metadata=self.metadata, **kwargs)
             except CmdUsage:
                 if self.usage is not None:
-                    await ctx.message.reply(codify('usage: ' + self.usage, ctx.mundane))
+                    await ctx.message.reply(codify('usage: ' + self.usage, ctx.mundane), mention_author=False)
                 else:
                     if ctx.mundane:
-                        await ctx.message.reply('incorrect usage, but no help text was found')
+                        await ctx.message.reply('incorrect usage, but no help text was found', mention_author=False)
                     else:
-                        await ctx.message.reply('```diff\n- incorrect usage, but no help text was found\n```')
+                        await ctx.message.reply('```diff\n- incorrect usage, but no help text was found\n```', mention_author=False)
             except Exception as e:
                 logger.error('error executing command ' + args[0], exc_info=True)
                 raise e
@@ -196,10 +197,10 @@ async def typing_loop(channel: TextChannel):
     typing_event[channel.id] = asyncio.Event()
     logger.info(f'Started typing in channel {channel.name}')
     async with channel.typing():
-        typing_event[channel.id].wait()
+        await typing_event[channel.id].wait()
         while len(curr_typing[channel.id]) > 0:
             typing_event[channel.id].clear()
-            typing_event[channel.id].wait()
+            await typing_event[channel.id].wait()
     logger.info(f'Stopped typing in channel {channel.name}')
     typing_event[channel.id] = None
 
@@ -221,10 +222,15 @@ class Terminal:
         asyncio.get_event_loop().create_task(self.async_write(content))
 
     async def async_write(self, content):
-        if self.call is None:
-            self.message = await self.channel.send(codify(content, self.mundane), allowed_mentions=None)
+        if self.message is None:
+            if self.call is None:
+                self.message = await self.channel.send(codify(content, self.mundane), allowed_mentions=None)
+            else:
+                self.message = await self.call.reply(codify(content, self.mundane),
+                                                     allowed_mentions=None, mention_author=False)
         else:
-            self.message = await self.call.reply(codify(content, self.mundane), allowed_mentions=None)
+            await self.message.edit(content=codify(self.content, self.mundane),
+                                    allowed_mentions=None, mention_author=False)
         logger.debug(f'Sent message: {content}')
 
     def close(self):
@@ -233,7 +239,7 @@ class Terminal:
         In the final product, stops typing.
         """
         logger.debug('Closed terminal')
-        pass
+        self.stop_typing()
 
     def start_typing(self):
         """
@@ -249,10 +255,13 @@ class Terminal:
         """
         Disables the typing indicator, if it was enabled by this terminal previously.
         """
-        if self.channel.id in curr_typing:
-            curr_typing[self.channel.id].remove(self)
-        if self.channel.id in typing_event:
-            typing_event[self.channel.id].set()
+        try:
+            if self.channel.id in curr_typing:
+                curr_typing[self.channel.id].remove(self)
+            if self.channel.id in typing_event:
+                typing_event[self.channel.id].set()
+        except ValueError:
+            pass
 
 
 class CommandContext:
@@ -335,22 +344,24 @@ async def on_message(client: Client, message: Message):
         if mundane:
             return False
 
-        await message.reply(codify('gmsh: command "' + args[0].lower() + '" not found'))
+        await message.reply(codify('gmsh: command "' + args[0].lower() + '" not found'), mention_author=False)
         return True
 
-    if not commands[args[0]].mundane:
+    if mundane and not commands[args[0]].mundane:
         return False
 
     try:
         ctx = CommandContext(message.channel, message.author, client, mundane, message, env_map={}, commands=commands)
         await commands[args[0]](ctx, args)
     except CmdUsage:
-        await message.reply(codify(commands[args[0]].usage(), mundane))
+        await message.reply(codify(commands[args[0]].usage(), mundane), mention_author=False)
     except Exception as e:
         logger.error(f'Exception while executing command line "{msg}"', exc_info=True)
         await message.reply(codify('Something went wrong while trying to process your request,'
-                                          ' please try again later.\n'
-                                          'If this error persists, please report it to @Nagato.', mundane))
+                                   ' please try again later.\n'
+                                   'If this error persists, please report it to '
+                                   f'@{cfg.devs.nagato.discord_handle("Nagato_Yoshikage#2286")}.',
+                                   mundane), mention_author=False)
         raise e
     return True
 

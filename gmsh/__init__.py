@@ -1,22 +1,22 @@
-import gmsh.config
+import ezconf
 
 # top-level defaults
-gmsh.config.from_dict({
+ezconf.from_dict({
     'db': {
         'main': {
-            'location': 'sqlite:///gmsh.sqlite'
+            'location': 'sqlite:///db/gmsh.sqlite'
         },
         'playground': {
-            'location': 'sqlite:///playground.sqlite'
+            'location': 'sqlite:///db/playground.sqlite'
         }
     }
 })
 
 # read user config directory
-gmsh.config.from_directory('config')
+ezconf.from_directory('config')
 
 # read environment variables
-gmsh.config.from_env_mapping({
+ezconf.from_env_mapping({
     'discord': {
         'bot_token': 'BOT_TOKEN'
     },

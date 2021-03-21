@@ -2,6 +2,12 @@ FROM python:3.8.6
 
 VOLUME /gmsh/config
 
+# default database volume in case nothing usable is provided
+VOLUME /db
+# and default env variables pointing there
+ENV DB_LOCATION sqlite:////db/gmsh.sqlite
+ENV DB_PLAYGROUND_LOCATION sqlite:////db/playground.sqlite
+
 WORKDIR /gmsh
 
 # install required libraries

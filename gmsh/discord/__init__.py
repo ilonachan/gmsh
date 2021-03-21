@@ -4,7 +4,7 @@ import inspect
 import discord
 import logging
 
-from gmsh.config import cfg
+from ezconf import cfg
 
 log = logging.getLogger(__name__)
 

@@ -3,7 +3,7 @@ import logging
 import discord
 from gmsh.discord import discord_handler
 
-from gmsh.config import cfg
+from ezconf import cfg
 
 logger = logging.getLogger(__name__)
 

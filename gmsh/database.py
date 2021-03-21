@@ -1,6 +1,6 @@
 import logging
 
-from gmsh.config import cfg
+from ezconf import cfg
 
 from sqlalchemy import create_engine, Table, Column, Integer, String, ForeignKey, Boolean
 from sqlalchemy.ext.declarative import declarative_base

@@ -37,7 +37,7 @@ async def handle_crane_react(client: Client, payload: RawReactionActionEvent):
         await asyncio.sleep(2)
         game['state'] = 'won' if game['pos'] in game['prize'] else 'lost' if game['pos'] in game['punish'] else 'draw'
 
-    await msg.edit(content=make_crane_msg(game))
+    await msg.edit(content=make_crane_msg(game), allowed_mentions=None, mention_author=False)
 
 emotes = {}
 

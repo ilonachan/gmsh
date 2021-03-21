@@ -3,7 +3,7 @@ import logging
 import discord
 from discord import Permissions
 
-from gmsh.config import cfg
+from ezconf import cfg
 from gmsh.discord.commands import CmdUsage, gmsh_command, codify, CommandContext
 
 logger = logging.getLogger(__name__)

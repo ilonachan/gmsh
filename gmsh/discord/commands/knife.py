@@ -14,7 +14,7 @@ async def request_answer(terminal, ctx, statement, call=None):
     if call is None:
         await terminal.channel.send('```\n' + msg.content + '\n```')
     else:
-        await call.reply('```\n' + msg.content + '\n```')
+        await call.reply('```\n' + msg.content + '\n```', mention_author=False)
 
 
 async def knife_single(terminal, ctx, statement):
