@@ -40,7 +40,7 @@ async def on_message(client, message):
 
 @discord_handler
 async def on_reaction_add(client, reaction, user):
-    if user.bot:
+    if user.bot or reaction.message.channel.type != discord.ChannelType.text:
         return
 
     yandere_role = discord.utils.find(lambda r: r.name == 'Stabby Stabby Yandere', user.guild.roles)

@@ -202,7 +202,38 @@ async def typing_loop(channel: TextChannel):
             typing_event[channel.id].clear()
             await typing_event[channel.id].wait()
     logger.info(f'Stopped typing in channel {channel.name}')
-    typing_event[channel.id] = None
+    del typing_event[channel.id]
+
+
+def start_typing(handle, channel):
+    """
+    Activates the typing indicator in the given channel.
+    """
+    if channel.id not in curr_typing:
+        curr_typing[channel.id] = []
+    curr_typing[channel.id].append(handle)
+    if channel.id not in typing_event:
+        asyncio.create_task(typing_loop(channel))
+
+
+def stop_typing(handle, channel=None):
+    """
+    Disables the typing indicator, if it was enabled by this terminal previously.
+    """
+    try:
+        if channel is not None:
+            if channel.id in curr_typing:
+                curr_typing[channel.id].remove(handle)
+            if channel.id in typing_event:
+                typing_event[channel.id].set()
+        else:
+            for id in curr_typing:
+                if handle in curr_typing[id]:
+                    curr_typing[id].remove(handle)
+                if id in typing_event:
+                    typing_event[id].set()
+    except ValueError:
+        pass
 
 
 class Terminal:
@@ -245,23 +276,13 @@ class Terminal:
         """
         Activates the typing indicator in the terminal's discord chat.
         """
-        if self.channel.id not in curr_typing:
-            curr_typing[self.channel.id] = []
-        curr_typing[self.channel.id].append(self)
-        if self.channel.id not in typing_event:
-            asyncio.get_event_loop().create_task(typing_loop(self.channel))
+        start_typing(self, self.channel)
 
     def stop_typing(self):
         """
         Disables the typing indicator, if it was enabled by this terminal previously.
         """
-        try:
-            if self.channel.id in curr_typing:
-                curr_typing[self.channel.id].remove(self)
-            if self.channel.id in typing_event:
-                typing_event[self.channel.id].set()
-        except ValueError:
-            pass
+        stop_typing(self, self.channel)
 
 
 class CommandContext:

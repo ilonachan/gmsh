@@ -5,7 +5,7 @@ formatters:
 handlers:
   console:
     class: logging.StreamHandler
-    level: INFO
+    level: DEBUG
     formatter: simple
     stream: ext://sys.stdout
   logfile:
@@ -16,7 +16,7 @@ handlers:
 loggers:
   __main__:
     level: DEBUG
-  'gmsh_terminal':
+  'gmsh':
     level: DEBUG
 root:
   level: INFO

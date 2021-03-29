@@ -91,7 +91,7 @@ async def process_lyrics(message):
 
 @discord_handler
 async def on_message(client, message):
-    if message.channel.guild is None:
+    if message.channel.type != discord.ChannelType.text:
         return False
     if message.author.bot:
         return False

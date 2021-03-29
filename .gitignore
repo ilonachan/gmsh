@@ -1,14 +1,9 @@
-/playground.sqlite
-/gmsh.sqlite
-/discord.yaml
 /gmsh.log
 /venv/
 __pycache__/
 /.idea/
-/gmsh_terminal/vault/vault_base.yaml
-/gmsh_terminal/vault/vault_key.key
 /pid.lock
-/secret_env
 /config/secret.yaml
+/config/deploy/
 /db/
 /deploy.env
