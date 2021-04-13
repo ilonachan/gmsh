@@ -106,6 +106,9 @@ observer = Observer()
 def load_all_commands(cmd_base):
     for file in [join(cmd_base, f) for f in listdir(cmd_base)]:
         if not isfile(file):
+            if isfile(f'{file}/__init__.py'):
+                load_command(f'{file}/__init__.py')
+                logger.info(f'Loaded commands from module {file}')
             continue
         if basename(file).startswith('__'):
             continue
