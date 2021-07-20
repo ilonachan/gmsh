@@ -9,7 +9,7 @@ from gmsh.discord.commands import CmdUsage, gmsh_command, codify, CommandContext
 logger = logging.getLogger(__name__)
 
 
-@gmsh_command('help', usage='help <command>')
+@gmsh_command('help', usage='help <command>', mundane=True)
 async def help_command(ctx, args, metadata=None):
     term = ctx.new_terminal()
     if len(args) < 2:

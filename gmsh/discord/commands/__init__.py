@@ -156,7 +156,10 @@ def gmsh_command(name, *, usage=None, aliases=None, mundane=False, **metadata):
             functools.update_wrapper(self, func)
 
             self.name = name
-            self.usage = usage
+            if callable(usage):
+                self.usage = usage
+            else:
+                self.usage = lambda: usage
             self.aliases = aliases
             self.metadata = metadata
             self.mundane = mundane

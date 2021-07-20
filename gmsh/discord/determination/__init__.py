@@ -17,9 +17,10 @@ async def on_message(client, message):
 
     if discord.utils.find(lambda r: r.name == 'someone', message.role_mentions):
         target = random.choice([m for m in message.channel.members
-                                if m.status in [discord.Status.online, discord.Status.idle] and not m.bot])
+                                # if m.status in [discord.Status.online, discord.Status.idle] and not m.bot])
+                                if not m.bot])
         ghostping = await message.channel.send(f'<@{target.id}>')
-        await ghostping.delete()
+        # await ghostping.delete()
         return
 
     if message.guild is not None:
