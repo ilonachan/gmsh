@@ -1,9 +1,15 @@
 # Use a builder container to install the dependencies,
 # then switch to a more lightweight interpreter
-FROM python:3.9
+FROM python:3.9 AS builder
 
 COPY requirements.txt .
 RUN pip install --user -r requirements.txt
+
+
+# Setup the final container
+FROM python:3.9-slim
+COPY --from=builder /root/.local /root/.local
+ENV PATH=/root/.local:$PATH
 
 WORKDIR /gmsh
 
